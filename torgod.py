@@ -5,6 +5,7 @@
 import os
 import sys
 import time
+from commands import getoutput
 
 def logo():
 	clearscreen()
@@ -41,26 +42,6 @@ def clearscreen():
 def exitfn():
 	exit(0)
 
-def torconnect():
-	#code for tor connect
-
-def tordisconnect():
-	#code for tor disconnect
-
-def t():
-	current_time=time.localtime()
-	ctime = time.strftime('%H:%M:%S', current_time)
-	return "["+ ctime + "]"
-
-def ip():
-	while True:
-		try:
-			ipadd = commands.getstatusoutput('wget -qO- https://check.torproject.org | grep -Po "(?<=strong>)[\d\.]+(?=</strong)"')
-		except :
-			continue
-		break
-	return ipadd[1]
-
 TorrcCfgString = """
 
 ##/////ADDED BY ToRGOD ///
@@ -77,6 +58,97 @@ resolvString = "nameserver 127.0.0.1"
 
 Torrc = "/etc/tor/torrc"
 resolv = "/etc/resolv.conf"
+
+
+
+def torconnect():
+	#code for tor connect
+	if TorrcCfgString in open(Torrc).read():
+		print("\nTor Setting configured already")
+	
+	else:
+		with open(Torrc,"a") as myfile:
+			myfile.write(TorrcCfgString)
+			print('\nTor settings configured')
+
+	if resolvString in open(resolv).read():
+		print("\nDNS Setting configured already")
+	
+	else:
+		with open(resolv,"w") as myfile:
+			myfile.write(TorrcCfgString)
+			print('\nDNS settings configured')
+
+
+	print("\nStarting TOR SERVICE")
+	os.system("\nservice tor start")
+	print("\nsetting Up IPTABLES")
+	
+	iptables_rules = """
+	NON_TOR="192.168.1.0/24 192.168.0.0/24"
+	TOR_UID=%s
+	TRANS_PORT="9040"
+
+	iptables -F
+	iptables -t nat -F
+
+	iptables -t nat -A OUTPUT -m owner --uid-owner $TOR_UID -j RETURN
+	iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 53
+	for NET in $NON_TOR 127.0.0.0/9 127.128.0.0/10; do
+	 iptables -t nat -A OUTPUT -d $NET -j RETURN
+	done
+	iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $TRANS_PORT
+
+	iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+	for NET in $NON_TOR 127.0.0.0/8; do
+	 iptables -A OUTPUT -d $NET -j ACCEPT
+	done
+	iptables -A OUTPUT -m owner --uid-owner $TOR_UID -j ACCEPT
+	iptables -A OUTPUT -j REJECT
+	"""%(getoutput("id -ur debian-tor"))
+
+	os.system(iptables_rules)
+	print("\nSetUp IPTABLES")
+	print t()+" \nFetching current IP..."
+	print t()+" \nCURRENT IP : "+ip()
+	
+
+def tordisconnect():
+	#code for tor disconnect
+	print('\nStopping torghost')
+	print(t()+"Reseting IPTABLES")
+	IpFlush = """
+	iptables -P INPUT ACCEPT
+	iptables -P FORWARD ACCEPT
+	iptables -P OUTPUT ACCEPT
+	iptables -t nat -F
+	iptables -t mangle -F
+	iptables -F
+	iptables -X
+	"""
+	os.system(IpFlush)
+
+	print("Done setting up IPTABLES")
+	print(t()+"restarting network manager")
+	os.system("service network-manager restart")
+	print("\n restart network-manager restart")
+	print('\nFetching IP')
+	print(t()+"The Ip is"+ip())
+
+
+def t():
+	current_time=time.localtime()
+	ctime = time.strftime('%H:%M:%S', current_time)
+	return "["+ ctime + "]"
+
+def ip():
+	while True:
+		try:
+			ipadd = commands.getstatusoutput('wget -qO- https://check.torproject.org | grep -Po "(?<=strong>)[\d\.]+(?=</strong)"')
+		except :
+			continue
+		break
+	return ipadd[1]
 
 
 def main():
