@@ -5,28 +5,19 @@
 import os
 import sys
 import time
-from commands import getoutput
+import subprocess as commands
+from subprocess import getoutput
+from stem.control import Controller
 
 def logo():
 	clearscreen()
-	x='''                                                                                                                        
-                                                                                                                
-			TTTTTTTTTTTTTTTTTTTTTTT                                               GGGGGGGGGGGGG                             d::::::d
-			T:::::::::::::::::::::T                                            GGG::::::::::::G                             d::::::d
-			T:::::::::::::::::::::T                                          GG:::::::::::::::G                             d::::::d
-			T:::::TT:::::::TT:::::T                                         G:::::GGGGGGGG::::G                             d:::::d 
-			TTTTTT  T:::::T  TTTTTTooooooooooo   rrrrr   rrrrrrrrr         G:::::G       GGGGGG   ooooooooooo       ddddddddd:::::d 
-			        T:::::T      oo:::::::::::oo r::::rrr:::::::::r       G:::::G               oo:::::::::::oo   dd::::::::::::::d 
-			        T:::::T     o:::::::::::::::or:::::::::::::::::r      G:::::G              o:::::::::::::::o d::::::::::::::::d 
-			        T:::::T     o:::::ooooo:::::orr::::::rrrrr::::::r     G:::::G    GGGGGGGGGGo:::::ooooo:::::od:::::::ddddd:::::d 
-			        T:::::T     o::::o     o::::o r:::::r     r:::::r     G:::::G    G::::::::Go::::o     o::::od::::::d    d:::::d 
-			        T:::::T     o::::o     o::::o r:::::r     rrrrrrr     G:::::G    GGGGG::::Go::::o     o::::od:::::d     d:::::d 
-			        T:::::T     o::::o     o::::o r:::::r                 G:::::G        G::::Go::::o     o::::od:::::d     d:::::d 
-			        T:::::T     o::::o     o::::o r:::::r                  G:::::G       G::::Go::::o     o::::od:::::d     d:::::d 
-			      TT:::::::TT   o:::::ooooo:::::o r:::::r                   G:::::GGGGGGGG::::Go:::::ooooo:::::od::::::ddddd::::::dd
-			      T:::::::::T   o:::::::::::::::o r:::::r                    GG:::::::::::::::Go:::::::::::::::o d:::::::::::::::::d
-			      T:::::::::T    oo:::::::::::oo  r:::::r                      GGG::::::GGG:::G oo:::::::::::oo   d:::::::::ddd::::d
-			      TTTTTTTTTTT      ooooooooooo    rrrrrrr                         GGGGGG   GGGG   ooooooooooo      ddddddddd   ddddd
+	x=''' 
+	___________                   ________             .___
+	\__    ___/  ____  _______   /  _____/   ____    __| _/
+	|    |    /  _ \ \_  __ \ /   \  ___  /  _ \  / __ | 
+	|    |   (  <_> ) |  | \/ \    \_\  \(  <_> )/ /_/ | 
+	|____|    \____/  |__|     \______  / \____/ \____ | 
+										\/              \/ 
 			                                                                                                                        
 			        Created By : CyberFreak                                                                                                               
 			                                                                                                                        
@@ -40,7 +31,7 @@ def clearscreen():
 	os.system('clear');
 
 def exitfn():
-	exit(0)
+	sys.exit()
 
 TorrcCfgString = """
 
@@ -109,8 +100,8 @@ def torconnect():
 
 	os.system(iptables_rules)
 	print("\nSetUp IPTABLES")
-	print t()+" \nFetching current IP..."
-	print t()+" \nCURRENT IP : "+ip()
+	print (t()+" \nFetching current IP...")
+	print (t()+" \nCURRENT IP : "+ip())
 	
 
 def tordisconnect():
@@ -130,8 +121,9 @@ def tordisconnect():
 
 	print("Done setting up IPTABLES")
 	print(t()+"restarting network manager")
+	os.system("service tor stop")
 	os.system("service network-manager restart")
-	print("\n restart network-manager restart")
+	print("\n restart network-manager")
 	print('\nFetching IP')
 	print(t()+"The Ip is"+ip())
 
@@ -152,22 +144,27 @@ def ip():
 
 
 def main():
-	clearscreen()
-	logo()
-	print('Tor anonymizer')
-	opt1=input('\n Choose an option \n\n 1)	Connect to Tor\n 2)	Disconnect From Tor \n	3)	Exit')
-	if opt1=='1':
-		clearscreen()
-		torconnect()
+	opt2=True
+	while opt2==True:
 
-	elif opt1=='2':
 		clearscreen()
-		tordisconnect()
+		logo()
+		print('Tor anonymizer')
+		opt1=input('\n Choose an option \n\n 1)	Connect to Tor\n 2)	Disconnect From Tor \n 3) Exit')
+		if opt1=='1':
+			clearscreen()
+			torconnect()
 
-	elif opt1=='3':
-		clearscreen()
-		exitfn()
+		elif opt1=='2':
+			clearscreen()
+			tordisconnect()
 
-	else
+		elif opt1=='3':
+			clearscreen()
+			exitfn()
+
+		else:
+			print("invalid option")
+			opt2==False;
 
 main()
