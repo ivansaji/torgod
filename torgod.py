@@ -51,19 +51,6 @@ resolvString = "nameserver 127.0.0.1"
 Torrc = "/etc/tor/torrc"
 resolv = "/etc/resolv.conf"
 
-def torswitch():
-	#tor switchcode
-	print(t()+"please wait.... switching Identity")
-	time.sleep(7)
-	print("Requesting New Identity")
-	with Controller.from_port(port = 9051) as controller:
-  		controller.authenticate()
-  		controller.signal(Signal.NEWNYM)
-	
-	print("Switched Identity")
-	print("Getting the new IP")
-	print(t()+" CURRENT IP : "+ip())
-
 def torconnect():
 	#code for tor connect
 	if TorrcCfgString in open(Torrc).read():
@@ -163,23 +150,19 @@ def main():
 		clearscreen()
 		logo()
 		print('Tor anonymizer')
-		opt1=input('\n Choose an option \n\n 1)	Connect to Tor\n 2) Switch IP \n 3) Disconnect From Tor \n 4) Exit')
+		opt1=input('\n Choose an option \n\n 1)	Connect to Tor\n 2) Disconnect From Tor \n 3) Exit')
 		if opt1=='1':
 			clearscreen()
 			logo()
 			torconnect()
 
-		elif opt1=='2':
-			clearscreen()
-			logo()
-			torswitch()
 
-		elif opt1=='3':
+		elif opt1=='2':
 			clearscreen()
 			logo()
 			tordisconnect()
 
-		elif opt1=='4':
+		elif opt1=='3':
 			clearscreen()
 			exitfn()
 
